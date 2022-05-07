@@ -1,0 +1,1 @@
+tar --exclude-from=ignore.txt -czf tagsNodeServer-$(date +%Y-%m-%d).tgz *
