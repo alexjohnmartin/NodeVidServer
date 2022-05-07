@@ -65,7 +65,7 @@ function return_video(req, res) {
 	  "Content-Range": `bytes ${start}-${end}/${videoSize}`,
 	  "Accept-Ranges": "bytes",
 	  "Content-Length": contentLength,
-	  "Content-Type": mimeType(videoPath.toLowerCase()),
+	  "Content-Type": read_model_vids.mimeType(videoPath.toLowerCase()),
 	};
   
 	// HTTP Status 206 for Partial Content
@@ -76,17 +76,6 @@ function return_video(req, res) {
   
 	// Stream the video chunk to the client
 	videoStream.pipe(res);
-}
-
-function mimeType(path) {
-	if (path.endsWith(".avi"))
-		return "video/x-msvideo";
-	if (path.endsWith(".wmv"))
-		return"video/x-ms-wmv";
-	if (path.endsWith(".rm"))
-		return "application/vnd.rn-realmedia";
-
-	return "video/mp4";
 }
 
 //******************************************************************************
