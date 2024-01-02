@@ -21,17 +21,6 @@ Currently this project searches for videos in 1 or more base directories (it wil
 
 You can set your video root directories by altering and adding `_loadFilesFromLocation(path)` lines in the read_modal_vids.js file, on line 9. 
 
-### Windows vs Mac/Linux
-Don't worry, this isn't a platform rant. But depending on your OS you will want to alter line 30 in read_modal_vids.js - this needs to be set to the correct type of path delimited (forward or back slash) for your OS. 
-
-For Windows it should be: 
-`var splitter = '\\';`
-
-For Mac/Linux it should be: 
-`var splitter = '/';`
-
-SIDE NOTE - yes, a future improvement is to alter this splitter to be dynamic, and not need manual alteration. 
-
 ## Running
 
 Start the local video server form the command line using: 
