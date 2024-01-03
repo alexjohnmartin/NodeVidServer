@@ -59,13 +59,14 @@ function _addFile(newFilePath, filename) {
 	fetch(uri)
 		.then(response => response.json())
 		.then(metadata => {
-			// console.log("metadata: " + JSON.stringify(metadata));
+			console.log("metadata: " + JSON.stringify(metadata));
 			var fileObj = new Object(); 
 			fileObj.year = year;
 			fileObj.id = guid.v1(); 
 			fileObj.path = newFilePath;
 			fileObj.poster = metadata.Poster;
 			fileObj.name = metadata.Title ? metadata.Title : name;
+			fileObj.type = metadata.Type ? metadata.Type : 'Unknown';
 			fileObj.genre = metadata.Genre ? metadata.Genre.split(',').map(genre => genre.trim()) : null;
 			files.push(fileObj);
 			// console.log("new file: " + JSON.stringify(fileObj));
@@ -85,6 +86,12 @@ function _html() {
 							$('.' + $('select[name="genreSelect"] option:selected').val()).show();
 						});
 					});
+					$(document).ready(function () {
+						$('select[name="typeSelect"]').change(function () {
+							$('.anyType').hide();
+							$('.' + $('select[name="typeSelect"] option:selected').val()).show();
+						});
+					});
 				</script>
 			</head>
 			<body style="background:black;color:white">
@@ -92,6 +99,10 @@ function _html() {
 				<select id="genreSelect" name='genreSelect'>
 					<option value="anyGenre" selected>All genres</option>
 					${_genreOptions()}
+				</select>
+				<select id="typeSelect" name='typeSelect'>
+					<option value="anyType" selected>All types</option>
+					${_typeOptions()}
 				</select>
 				<div style="display:grid;gap:50px;grid-template-columns: auto auto auto;">${_listItems()}</div>
 			</body>
@@ -118,7 +129,7 @@ function _listItems() {
 
 function _listItem(file) {
 	if (file.poster) return `
-		<div class="anyGenre ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
+		<div class="anyGenre anyType ${file.type} ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
 			<a href="/player/${file.id}" style="display:flex;flex-direction:column;">
 				<h2>${file.name}</h2>
 				<img src="${file.poster}" style="max-width:200px" />
@@ -127,7 +138,7 @@ function _listItem(file) {
 	`;
 
 	return `
-		<div class="anyGenre ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
+		<div class="anyGenre anyType ${file.type} ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
 			<a href="/player/${file.id}">
 				<h2>${file.name}</h2>
 			</a>
@@ -148,6 +159,19 @@ function _genreOptions() {
 	}
 
 	return distinctGenres.map((genre) => (`<option value="${genre}">${genre}</option>`));
+}
+
+function _typeOptions() {
+	const distinctTypes = [];
+	for (let f = 0; f < files.length; f++) {
+		if (files[f].type) {
+			if (distinctTypes.indexOf(files[f].type) < 0) {
+				distinctTypes.push(files[f].type);
+			}
+		}
+	}
+
+	return distinctTypes.map((type) => (`<option value="${type}">${type}</option>`));
 }
 
 function _mimeType(path) {
