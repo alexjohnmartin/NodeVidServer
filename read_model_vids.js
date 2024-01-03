@@ -68,7 +68,7 @@ function _addFile(newFilePath, filename) {
 			fileObj.name = metadata.Title ? metadata.Title : name;
 			fileObj.genre = metadata.Genre ? metadata.Genre.split(',').map(genre => genre.trim()) : null;
 			files.push(fileObj);
-			console.log("new file: " + JSON.stringify(fileObj));
+			// console.log("new file: " + JSON.stringify(fileObj));
 		});
 }
 
@@ -77,9 +77,22 @@ function _html() {
 		<html>
 			<head>
 				<title>Vids</title>
+				<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+				<script>
+					$(document).ready(function () {
+						$('select[name="genreSelect"]').change(function () {
+							$('.anyGenre').hide();
+							$('.' + $('select[name="genreSelect"] option:selected').val()).show();
+						});
+					});
+				</script>
 			</head>
 			<body style="background:black;color:white">
 				<h1>Vids</h1>
+				<select id="genreSelect" name='genreSelect'>
+					<option value="anyGenre" selected>All genres</option>
+					${_genreOptions()}
+				</select>
 				<div style="display:grid;gap:50px;grid-template-columns: auto auto auto;">${_listItems()}</div>
 			</body>
 		</html>`;
@@ -105,7 +118,7 @@ function _listItems() {
 
 function _listItem(file) {
 	if (file.poster) return `
-		<div>
+		<div class="anyGenre ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
 			<a href="/player/${file.id}" style="display:flex;flex-direction:column;">
 				<h2>${file.name}</h2>
 				<img src="${file.poster}" style="max-width:200px" />
@@ -114,12 +127,27 @@ function _listItem(file) {
 	`;
 
 	return `
-		<div>
+		<div class="anyGenre ${file.genre && file.genre.map((genre) => `${genre}`).join(' ')}">
 			<a href="/player/${file.id}">
 				<h2>${file.name}</h2>
 			</a>
 		</div>
 	`;
+}
+
+function _genreOptions() {
+	const distinctGenres = [];
+	for (let f = 0; f < files.length; f++) {
+		if (files[f].genre && files[f].genre.length > 0) {
+			for (let g = 0; g < files[f].genre.length; g++) {
+				if (distinctGenres.indexOf(files[f].genre[g]) < 0) {
+					distinctGenres.push(files[f].genre[g]);
+				}
+			}
+		}
+	}
+
+	return distinctGenres.map((genre) => (`<option value="${genre}">${genre}</option>`));
 }
 
 function _mimeType(path) {
